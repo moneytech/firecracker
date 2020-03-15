@@ -10,13 +10,13 @@ use std::sync::{Arc, Mutex};
 use arch::DeviceType;
 use device_manager::mmio::MMIO_CFG_SPACE_OFF;
 use devices::virtio::{Block, MmioTransport, Net, TYPE_BLOCK, TYPE_NET};
-use logger::LOGGER;
+use logger::METRICS;
 use resources::VmResources;
 use rpc_interface::VmmActionError;
 use vmm_config;
 use vmm_config::drive::DriveError;
 use vmm_config::machine_config::VmConfig;
-use vmm_config::net::NetworkInterfaceUpdateConfig;
+use vmm_config::net::{NetworkInterfaceError, NetworkInterfaceUpdateConfig};
 use Vmm;
 
 /// Shorthand result type for external VMM commands.
@@ -34,15 +34,16 @@ impl VmmController {
         self.vm_resources.vm_config()
     }
 
-    /// Flush metrics. Defer to inner Vmm. We'll move to a variant where the Vmm
-    /// simply exposes functionality like getting the dirty pages, and then we'll have the
-    /// metrics flushing logic entirely on the outside.
+    /// Write the metrics on user demand (flush). We use the word `flush` here to highlight the fact
+    /// that the metrics will be written immediately.
+    /// Defer to inner Vmm. We'll move to a variant where the Vmm simply exposes functionality like
+    /// getting the dirty pages, and then we'll have the metrics flushing logic entirely on the outside.
     pub fn flush_metrics(&mut self) -> ActionResult {
         // FIXME: we're losing the bool saying whether metrics were actually written.
-        LOGGER
-            .log_metrics()
+        METRICS
+            .write()
             .map(|_| ())
-            .map_err(super::Error::Logger)
+            .map_err(super::Error::Metrics)
             .map_err(VmmActionError::InternalVmm)
     }
 
@@ -54,11 +55,6 @@ impl VmmController {
             .unwrap()
             .send_ctrl_alt_del()
             .map_err(VmmActionError::InternalVmm)
-    }
-
-    /// Stops the inner Vmm and exits the process with the provided exit_code.
-    pub fn stop(&mut self, exit_code: i32) {
-        self.vmm.lock().unwrap().stop(exit_code)
     }
 
     /// Creates a new `VmmController`.
@@ -222,7 +218,9 @@ impl VmmController {
                     get_handler_arg!(tx_rate_limiter, ops),
                 );
         } else {
-            // TODO: Update this error after all devices have been ported.
+            return Err(VmmActionError::NetworkConfig(
+                NetworkInterfaceError::DeviceIdNotFound,
+            ));
         }
 
         Ok(())

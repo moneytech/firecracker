@@ -5,7 +5,6 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 
-extern crate epoll;
 #[macro_use]
 extern crate logger;
 extern crate micro_http;
@@ -319,6 +318,7 @@ mod tests {
             started: false,
             id: "test_serve_action_req".to_string(),
             vmm_version: "version 0.1.0".to_string(),
+            app_name: "app name".to_string(),
         }));
 
         let to_vmm_fd = EventFd::new(libc::EFD_NONBLOCK).unwrap();
@@ -350,6 +350,7 @@ mod tests {
             started: false,
             id: "test_get_instance_info".to_string(),
             vmm_version: "version 0.1.0".to_string(),
+            app_name: "app name".to_string(),
         }));
 
         let to_vmm_fd = EventFd::new(libc::EFD_NONBLOCK).unwrap();
@@ -376,6 +377,7 @@ mod tests {
             started: false,
             id: "test_get_mmds".to_string(),
             vmm_version: "version 0.1.0".to_string(),
+            app_name: "app name".to_string(),
         }));
 
         let to_vmm_fd = EventFd::new(libc::EFD_NONBLOCK).unwrap();
@@ -402,6 +404,7 @@ mod tests {
             started: false,
             id: "test_put_mmds".to_string(),
             vmm_version: "version 0.1.0".to_string(),
+            app_name: "app name".to_string(),
         }));
 
         let to_vmm_fd = EventFd::new(libc::EFD_NONBLOCK).unwrap();
@@ -431,6 +434,7 @@ mod tests {
             started: false,
             id: "test_patch_mmds".to_string(),
             vmm_version: "version 0.1.0".to_string(),
+            app_name: "app name".to_string(),
         }));
 
         let to_vmm_fd = EventFd::new(libc::EFD_NONBLOCK).unwrap();
@@ -463,6 +467,7 @@ mod tests {
             started: false,
             id: "test_handle_request".to_string(),
             vmm_version: "version 0.1.0".to_string(),
+            app_name: "app name".to_string(),
         }));
 
         let to_vmm_fd = EventFd::new(libc::EFD_NONBLOCK).unwrap();
@@ -564,6 +569,7 @@ mod tests {
             started: false,
             id: "test_handle_request".to_string(),
             vmm_version: "version 0.1.0".to_string(),
+            app_name: "app name".to_string(),
         }));
 
         let to_vmm_fd = EventFd::new(libc::EFD_NONBLOCK).unwrap();
